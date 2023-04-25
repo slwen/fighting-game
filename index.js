@@ -97,6 +97,25 @@ const keys ={
   ArrowUp: { pressed: false }
 }
 
+function rectCollision({ rect1, rect2 }) {
+  const rect1LeftEdge = rect1.attackBox.position.x
+  const rect1RightEdge = rect1.attackBox.position.x + rect1.attackBox.width
+  const rect1BottomEdge = rect1.attackBox.position.y + rect1.attackBox.height
+  const rect1TopEdge = rect1.attackBox.position.y
+
+  const rect2LeftEdge = rect2.position.x
+  const rect2RightEdge = rect2.position.x + rect2.width
+  const rect2TopEdge = rect2.position.y
+  const rect2BottomEdge = rect2.position.y + rect2.height
+
+  return (
+    rect1RightEdge >= rect2LeftEdge
+    && rect1LeftEdge <= rect2RightEdge
+    && rect1BottomEdge >= rect2TopEdge
+    && rect1TopEdge <= rect2BottomEdge
+  )
+}
+
 function animate() {
   window.requestAnimationFrame(animate)
   c.fillStyle = 'black'
@@ -120,16 +139,14 @@ function animate() {
     player2.velocity.x = 4
   }
 
-  // Detect collision
-  if (
-    player.attackBox.position.x + player.attackBox.width>= player2.position.x
-    && player.attackBox.position.x <= player2.position.x + player2.width
-    && player.attackBox.position.y + player.attackBox.height >= player2.position.y
-    && player.attackBox.position.y <= player2.position.y + player2.height
-    && player.isAttacking
-  ) {
+  // Detect attack collisions
+  if (rectCollision({ rect1: player, rect2: player2 }) && player.isAttacking) {
     player.isAttacking = false
     console.log('P1 ATK landed')
+  }
+  if (rectCollision({ rect1: player2, rect2: player }) && player2.isAttacking) {
+    player2.isAttacking = false
+    console.log('P2 ATK landed')
   }
 }
 
