@@ -9,16 +9,30 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 const gravity = .6
 
 class Sprite {
-  constructor({ position, velocity }) {
+  constructor({ position, velocity, color }) {
     this.position = position
     this.velocity = velocity
+    this.width = 50
     this.height = 150
     this.lastKey
+    this.attackBox = {
+      position: this.position,
+      width: 100,
+      height: 50
+    }
+    this.color = color
+    this.isAttacking
   }
 
   draw() {
-    c.fillStyle = 'red'
-    c.fillRect(this.position.x, this.position.y, 50, this.height)
+    c.fillStyle = this.color
+    c.fillRect(this.position.x, this.position.y, this.width, this.height)
+
+    // Attack Box
+    if (this.isAttacking) {
+      c.fillStyle = "green"
+      c.fillRect(this.attackBox.position.x, this.attackBox.position.y, this.attackBox.width, this.attackBox.height)
+    }
   }
 
   update() {
@@ -33,18 +47,27 @@ class Sprite {
       this.velocity.y += gravity
     }
   }
+
+  attack() {
+    this.isAttacking = true
+    setTimeout(() => {
+      this.isAttacking = false
+    }, 120)
+  }
 }
 
 const player = new Sprite(
   {
     position: { x: 0, y: 0 },
-    velocity: { x: 0, y: 0 }
+    velocity: { x: 0, y: 0 },
+    color: 'blue'
   }
 )
 const player2 = new Sprite(
   {
     position: { x: 400, y: 0 },
-    velocity: { x: 0, y: 0 }
+    velocity: { x: 0, y: 0 },
+    color: 'red'
   }
 )
 
@@ -82,6 +105,18 @@ function animate() {
   } else if (keys.ArrowRight.pressed && player2.lastKey == 'ArrowRight') {
     player2.velocity.x = 4
   }
+
+  // Detect collision
+  if (
+    player.attackBox.position.x + player.attackBox.width>= player2.position.x
+    && player.attackBox.position.x <= player2.position.x + player2.width
+    && player.attackBox.position.y + player.attackBox.height >= player2.position.y
+    && player.attackBox.position.y <= player2.position.y + player2.height
+    && player.isAttacking
+  ) {
+    player.isAttacking = false
+    console.log('P1 ATK landed')
+  }
 }
 
 animate()
@@ -98,6 +133,9 @@ window.addEventListener('keydown', (event) => {
       break 
     case 'w':
       player.velocity.y = -15
+      break
+    case 'f':
+      player.attack()
       break
     
     case 'ArrowRight':
