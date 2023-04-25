@@ -9,14 +9,18 @@ c.fillRect(0, 0, canvas.width, canvas.height)
 const gravity = .6
 
 class Sprite {
-  constructor({ position, velocity, color }) {
+  constructor({ position, velocity, color = 'blue', offset }) {
     this.position = position
     this.velocity = velocity
     this.width = 50
     this.height = 150
     this.lastKey
     this.attackBox = {
-      position: this.position,
+      position: {
+        x: this.position.x,
+        y: this.position.y
+      },
+      offset,
       width: 100,
       height: 50
     }
@@ -37,6 +41,8 @@ class Sprite {
 
   update() {
     this.draw()
+    this.attackBox.position.x = this.position.x - this.attackBox.offset.x
+    this.attackBox.position.y = this.position.y
     
     this.position.x += this.velocity.x
     this.position.y += this.velocity.y
@@ -60,14 +66,22 @@ const player = new Sprite(
   {
     position: { x: 0, y: 0 },
     velocity: { x: 0, y: 0 },
-    color: 'blue'
+    color: 'blue',
+    offset: {
+      x: 0,
+      y: 0
+    }
   }
 )
 const player2 = new Sprite(
   {
     position: { x: 400, y: 0 },
     velocity: { x: 0, y: 0 },
-    color: 'red'
+    color: 'red',
+    offset: {
+      x: 50,
+      y: 0
+    }
   }
 )
 
@@ -148,6 +162,9 @@ window.addEventListener('keydown', (event) => {
       break 
     case 'ArrowUp':
       player2.velocity.y = -15
+      break 
+    case 'Alt':
+      player2.attack()
       break 
   }
 })
