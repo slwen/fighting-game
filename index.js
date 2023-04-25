@@ -23,11 +23,13 @@ class Sprite {
   update() {
     this.draw()
     
+    this.position.x += this.velocity.x
+    this.position.y += this.velocity.y
+
     if (this.position.y + this.height + this.velocity.y >= canvas.height) {
       this.velocity.y = 0
     } else {
       this.velocity.y += gravity
-      this.position.y += this.velocity.y
     }
   }
 }
@@ -47,7 +49,12 @@ const enemy = new Sprite(
 
 player.draw()
 enemy.draw()
-console.log(player) // DEBUG
+
+const keys ={
+  a: { pressed: false },
+  d: { pressed: false }
+}
+let lastKey
 
 function animate() {
   window.requestAnimationFrame(animate)
@@ -55,6 +62,37 @@ function animate() {
   c.fillRect(0, 0, canvas.width, canvas.height)
   player.update()
   enemy.update()
+
+  player.velocity.x = 0
+  if (keys.a.pressed && lastKey == 'a') {
+    player.velocity.x = -1
+  } else if (keys.d.pressed && lastKey == 'd') {
+    player.velocity.x = 1
+  }
 }
 
 animate()
+
+window.addEventListener('keydown', (event) => {
+  switch (event.key) {
+    case 'd':
+      keys.d.pressed = true
+      lastKey = 'd'
+      break
+    case 'a':
+      keys.a.pressed = true
+      lastKey = 'a'
+      break 
+  }
+})
+
+window.addEventListener('keyup', (event) => {
+  switch (event.key) {
+    case 'd':
+      keys.d.pressed = false
+      break
+    case 'a':
+      keys.a.pressed = false
+      break
+  }
+})
